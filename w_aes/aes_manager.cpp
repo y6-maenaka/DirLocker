@@ -24,7 +24,7 @@ std::pair< size_t , std::shared_ptr<unsigned char> > W_AES128Manager::encrypt409
 
 std::pair< size_t , std::shared_ptr<unsigned char> > W_AES128Manager::decrypt4096Base( const unsigned char* cipherBin , EVP_CIPHER_CTX* cctx , size_t size )
 {
-  std::shared_ptr<unsigned char> plainBin = std::shared_ptr<unsigned char>( new unsigned char[size] );
+  std::shared_ptr<unsigned char> plainBin = std::shared_ptr<unsigned char>( new unsigned char[size + 16] );
   int plainBinLength = 0;
 
   if( EVP_DecryptUpdate( cctx , plainBin.get(), &plainBinLength , cipherBin, size ) <= 0 ){
@@ -206,6 +206,7 @@ size_t W_AES128Manager::decryptStream( std::string cipherFilePath, size_t begin 
 	return 0;
   }
 
+
   if( size == 0 ) size = fileSize;
   size_t cipherDataLength = 0;
   cipherDataLength = ( (begin + size) > fileSize ) ? fileSize - begin : size;
@@ -227,6 +228,7 @@ size_t W_AES128Manager::decryptStream( std::string cipherFilePath, size_t begin 
 	}
 	decryptedTotalLength += decrypted.first;
 	plainFile.stream.write( reinterpret_cast<const char*>(decrypted.second.get()), decrypted.first );
+	decrypted.second.reset();
   }
   
   int finalLength = 0;
@@ -237,23 +239,19 @@ size_t W_AES128Manager::decryptStream( std::string cipherFilePath, size_t begin 
 	return 0;
   }
 
-  int flag = 0;
-  if( (flag = EVP_DecryptFinal_ex( cctx , (decrypted.second).get() + decrypted.first , &finalLength )) <= 0 )
+  if( EVP_DecryptFinal_ex( cctx , (decrypted.second).get() + decrypted.first , &finalLength ) <= 0 )
   {
 	EVP_CIPHER_CTX_free( cctx ); 
 	return 0;
   }
+
+  decrypted.second.get() + decrypted.first + finalLength;
 
   decryptedTotalLength += decrypted.first + finalLength;
   plainFile.stream.write( reinterpret_cast<const char*>( decrypted.second.get()) , decrypted.first + finalLength );
 
   return decryptedTotalLength;
 }
-
-
-
-
-
 
 
 size_t W_AES128Manager::encryptLength( size_t plainBinLength )

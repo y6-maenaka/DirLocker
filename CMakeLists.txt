@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.2 )
 
-project( OPENSSL_WRAPPER CXX )
+project( DIR_LOCKER CXX )
 
 find_package( PkgConfig REQUIRED )
 find_package( OPENSSL REQUIRED )
@@ -15,45 +15,41 @@ endif()
 
 
 
-add_library( W_SHA SHARED
-			  ./w_sha/sha.cpp
+add_library( CRYPTO_MANAGER SHARED
+		  ./w_sha/sha.cpp
+		  ./w_evp_pkey/evp_pkey.cpp
+		  ./w_aes/aes_manager.cpp
+		  ./w_rsa/rsa_manager.cpp
+
 )
-target_link_libraries( W_SHA PUBLIC
-						${OPENSSL_LIBRARIES}
+target_link_libraries( CRYPTO_MANAGER PUBLIC
+						${OPENSSL_LIBRARIES}	
 )
 
-add_library( W_EVP_PKEY SHARED
-			  ./w_evp_pkey/evp_pkey.cpp
+add_library( DIR_CRYPTOR SHARED
+			./dir_cryptor/dir_cryptor.cpp
 )
-target_link_libraries( W_EVP_PKEY PUBLIC
-						${OPENSSL_LIBRARIES}
-)
+target_link_libraries( DIR_CRYPTOR PUBLIC
+					  CRYPTO_MANAGER
 
-
-add_library( W_RSA_MANAGER SHARED
-			  ./w_rsa/rsa_manager.cpp
-)
-target_link_libraries( W_RSA_MANAGER PUBLIC
-						W_EVP_PKEY
-						W_SHA
-						${OPENSSL_LIBRARIES}
-)
-
-add_library( W_AES_MANAGER SHARED
-			  ./w_aes/aes_manager.cpp
-)
-target_link_libraries( W_AES_MANAGER PUBLIC
-						${OPENSSL_LIBRARIES}
 )
 
 
-
-add_executable(runner runner.cpp)
-target_link_libraries( runner PRIVATE 
-						W_RSA_MANAGER
-						W_AES_MANAGER
-						W_EVP_PKEY
+if( BUILD_HOST )
+add_executable( host ./host/host.cpp )
+target_link_libraries( host PRIVATE 
+						CRYPTO_MANAGER
 )
+endif()
+
+if( BUILD_USER )
+add_executable( user ./user/user.cpp )
+target_link_libraries( user PRIVATE
+					  CRYPTO_MANAGER
+					  DIR_CRYPTOR
+
+)
+endif()
 
 
 
