@@ -7,7 +7,19 @@
 
 #include <iostream>
 #include <string>
+#include <map>
+#include <random>
+#include <filesystem>
 
+const std::map< std::string , const int > mode = {
+  { "lock" , 1 },
+  { "unlock" ,2 },
+  { "clear", 3 }
+};
+
+const std::string targetDirPath = "../__TARGET__";
+const std::string publicPemPath = "../public.pem";
+const bool debug = true;
 
 
 #endif // 

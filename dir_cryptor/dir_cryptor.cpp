@@ -3,6 +3,10 @@
 
 
 
+DirCryptor::DirCryptor( std::string dirPath )
+{
+  _dirPath = dirPath;
+}
 
 DirCryptor::DirCryptor( std::string dirPath , openssl_wrapper::aes::W_AESKey_128* key ) : _key(key)
 {
@@ -23,7 +27,7 @@ void DirCryptor::claerLockedFile()
 	}
   }
 
-  std::cout << "\n\n" << "deleted :: " << count << " files" << "\n";
+  std::cout << "\n\n" << "deleted :: " << count << " files" << "\n\n";
 }
 
 void DirCryptor::init()
@@ -58,7 +62,7 @@ bool DirCryptor::decryptFile( const fs::directory_entry& entry )
   if( !(fs::is_regular_file(entry) )) return false;
 
   size_t decryptedLength;
-  std::string unLockedFilePath = entry.path().parent_path().string() + entry.path().stem().string();
+  std::string unLockedFilePath = entry.path().parent_path().string() + "/" + entry.path().stem().string();
 
   decryptedLength = openssl_wrapper::aes::W_AES128Manager::decryptStream( entry.path().string() , 0 , 0 , _key, unLockedFilePath );
 
@@ -79,7 +83,7 @@ bool DirCryptor::startEncrypt()
 	}
   }
 
-  std::cout << "\n\n" << "locked :: " << count << " files" << "\n";
+  std::cout << "\n\n" << "locked :: " << count << " files" << "\n\n";
   return true;
 }
 
@@ -100,6 +104,6 @@ bool DirCryptor::startDecrypt()
 	}
   }
 
-  std::cout << "\n\n" << "unlocked :: " << count << " files" << "\n";
+  std::cout << "\n\n" << "unlocked :: " << count << " files" << "\n\n";
   return true;
 }

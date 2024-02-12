@@ -20,6 +20,7 @@ add_library( CRYPTO_MANAGER SHARED
 		  ./w_evp_pkey/evp_pkey.cpp
 		  ./w_aes/aes_manager.cpp
 		  ./w_rsa/rsa_manager.cpp
+		  ./w_base64/base64.cpp
 
 )
 target_link_libraries( CRYPTO_MANAGER PUBLIC

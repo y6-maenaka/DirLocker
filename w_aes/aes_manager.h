@@ -27,7 +27,7 @@ private:
   std::shared_ptr<unsigned char> _body;
 
 public:
-  W_AESKey_128( std::string fromStr ) : _body(nullptr)
+  W_AESKey_128( std::string fromStr ) : _body(nullptr) // 仕様としてキーは文字列に限定する
   {
 	if( fromStr.size() != AES_CBC_128_BYTES  ) return;
 	_body = std::shared_ptr<unsigned char>( new unsigned char[AES_CBC_128_BYTES ] );

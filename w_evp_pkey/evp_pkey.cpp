@@ -117,6 +117,14 @@ void W_EVP_PKEY::pkey( std::shared_ptr<EVP_PKEY> fromPkey )
   _body = fromPkey;
 }
 
+void W_EVP_PKEY::clean()
+{
+  if( _body != nullptr ){
+	EVP_PKEY_free( _body.get() );
+	_body.reset();
+  }
+}
+
 
 std::shared_ptr<EVP_PKEY> empty_pkey()
 {
@@ -197,7 +205,6 @@ std::shared_ptr<W_EVP_PKEY> w_rsa_pkey( int keyBits )
 
   return ret;
 }
-
 
 
 

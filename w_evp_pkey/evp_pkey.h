@@ -45,6 +45,7 @@ public:
 
   int type();
   void print() const;
+  void clean();
 };
 
 

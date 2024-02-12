@@ -245,8 +245,6 @@ size_t W_AES128Manager::decryptStream( std::string cipherFilePath, size_t begin 
 	return 0;
   }
 
-  decrypted.second.get() + decrypted.first + finalLength;
-
   decryptedTotalLength += decrypted.first + finalLength;
   plainFile.stream.write( reinterpret_cast<const char*>( decrypted.second.get()) , decrypted.first + finalLength );
 

@@ -37,6 +37,7 @@ protected:
   bool decryptFile( const fs::directory_entry& entry );
 
 public:
+  DirCryptor( std::string dirPath );
   DirCryptor( std::string dirPath , openssl_wrapper::aes::W_AESKey_128* key );
 
   void init();
