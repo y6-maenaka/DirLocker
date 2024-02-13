@@ -3,27 +3,32 @@
 
 
 
-DirCryptor::DirCryptor( std::string dirPath )
+DirCryptor::DirCryptor( const std::vector<const std::string> dirPaths )
 {
-  _dirPath = dirPath;
+  for( auto itr : dirPaths )
+	_dirPaths.push_back( itr );
 }
 
-DirCryptor::DirCryptor( std::string dirPath , openssl_wrapper::aes::W_AESKey_128* key ) : _key(key)
+DirCryptor::DirCryptor( const std::vector<const std::string> dirPaths , openssl_wrapper::aes::W_AESKey_128* key ) : _key(key)
 {
-  _dirPath = dirPath;
+  for( auto itr : dirPaths )
+	_dirPaths.push_back( itr );
   return;
 }
 
 void DirCryptor::claerLockedFile()
 {
   unsigned int count = 0;
-  for( const fs::directory_entry& entry : fs::recursive_directory_iterator(_dirPath) )
+  for( auto itr : _dirPaths )
   {
-	if( fs::is_regular_file(entry) && entry.path().extension() == LockedExtension ){
-	  std::string entryPath = entry.path().string();
-	  fs::remove(entry);
-	  std::cout << entryPath << " - " << "\x1b[31m" << "delete" << "\x1b[39m" << "\n";
-	  count++;
+	for( const fs::directory_entry& entry : fs::recursive_directory_iterator(itr) )
+	{
+	  if( fs::is_regular_file(entry) && entry.path().extension() == LockedExtension ){
+		std::string entryPath = entry.path().string();
+		fs::remove(entry);
+		std::cout << entryPath << " - " << "\x1b[31m" << "delete" << "\x1b[39m" << "\n";
+		count++;
+	  }
 	}
   }
 
@@ -32,13 +37,17 @@ void DirCryptor::claerLockedFile()
 
 void DirCryptor::init()
 {
-  std::cout << fs::exists(_dirPath) << "\n";
-  std::cout << fs::is_directory(_dirPath) << "\n";
+  for( auto itr : _dirPaths )
+	std::cout << fs::exists(itr) << "\n";
+  for( auto itr : _dirPaths )
+	std::cout << fs::is_directory(itr) << "\n";
 
-  const auto rDirItr = fs::recursive_directory_iterator(_dirPath);
-  for( auto itr : rDirItr )
-  {
-	std::cout << itr.path().string() << "\x1b[31m" << " - raw" << "\x1b[39m" << "\n";
+  for( auto itr : _dirPaths ) {
+	const auto rDirItr = fs::recursive_directory_iterator(itr);
+	for( auto _itr : rDirItr )
+	{
+	  std::cout << _itr.path().string() << "\x1b[31m" << " - raw" << "\x1b[39m" << "\n";
+	}
   }
 
   _encryptFlag = true;
@@ -73,15 +82,18 @@ bool DirCryptor::decryptFile( const fs::directory_entry& entry )
 bool DirCryptor::startEncrypt()
 {
   unsigned int count = 0;
-  for( const fs::directory_entry& entry : fs::recursive_directory_iterator(_dirPath) )
-  {
-	if( this->encryptFile( entry ) )
+  for( auto itr : _dirPaths ){
+	for( const fs::directory_entry& entry : fs::recursive_directory_iterator(itr) )
 	{
-	  std::cout << entry.path().string() << " - " << "\x1b[32m" << "lock" << "\x1b[39m" << "\n";
-	  fs::remove( entry );
-	  count++;
+	  if( this->encryptFile( entry ) )
+	  {
+		std::cout << entry.path().string() << " - " << "\x1b[32m" << "lock" << "\x1b[39m" << "\n";
+		fs::remove( entry );
+		count++;
+	  }
 	}
   }
+
 
   std::cout << "\n\n" << "locked :: " << count << " files" << "\n\n";
   return true;
@@ -91,15 +103,18 @@ bool DirCryptor::startEncrypt()
 bool DirCryptor::startDecrypt()
 {
   unsigned int count = 0;
-  for( const fs::directory_entry& entry : fs::recursive_directory_iterator(_dirPath) )
+  for( auto itr : _dirPaths )
   {
-	if( entry.path().extension() == LockedExtension )
+	for( const fs::directory_entry& entry : fs::recursive_directory_iterator(itr) )
 	{
-	  if( this->decryptFile( entry ) )
+	  if( entry.path().extension() == LockedExtension )
 	  {
-		std::cout << entry.path().string() << " - " << "\x1b[34m" << "unlock" << "\x1b[39m" << "\n";
-		fs::remove( entry );
-		count++;
+		if( this->decryptFile( entry ) )
+		{
+		  std::cout << entry.path().string() << " - " << "\x1b[34m" << "unlock" << "\x1b[39m" << "\n";
+		  fs::remove( entry );
+		  count++;
+		}
 	  }
 	}
   }

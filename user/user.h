@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <map>
 #include <random>
 #include <filesystem>
@@ -17,7 +18,11 @@ const std::map< std::string , const int > mode = {
   { "clear", 3 }
 };
 
-const std::string targetDirPath = "../__TARGET__";
+const std::string targetDirPath_1 = "../__TARGET__";
+const std::string targetDirPath_2 = "../__SUB_TARGET__";
+
+
+
 const std::string publicPemPath = "../public.pem";
 const bool debug = true;
 

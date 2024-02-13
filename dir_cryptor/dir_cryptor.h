@@ -26,7 +26,8 @@ class DirCryptor
 {
 
 private:
-  fs::path _dirPath;
+  // fs::path _dirPath;
+  std::vector< fs::path > _dirPaths;
   openssl_wrapper::aes::W_AESKey_128* _key;
   bool _encryptFlag = false;
 
@@ -37,8 +38,8 @@ protected:
   bool decryptFile( const fs::directory_entry& entry );
 
 public:
-  DirCryptor( std::string dirPath );
-  DirCryptor( std::string dirPath , openssl_wrapper::aes::W_AESKey_128* key );
+  DirCryptor( const std::vector< const std::string> dirPaths );
+  DirCryptor( const std::vector< const std::string> dirPaths , openssl_wrapper::aes::W_AESKey_128* key );
 
   void init();
   bool startEncrypt();

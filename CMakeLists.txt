@@ -5,6 +5,8 @@ project( DIR_LOCKER CXX )
 find_package( PkgConfig REQUIRED )
 find_package( OPENSSL REQUIRED )
 
+message( "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}" )
+
 if( OPENSSL_FOUND )
   include_directories( ${OPENSSL_INCLUDE_DIR} )
   message( STATUS "Using OpenSSL ${OPENSSL_VERSION}" )
