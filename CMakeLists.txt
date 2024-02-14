@@ -3,18 +3,26 @@ cmake_minimum_required( VERSION 3.2 )
 project( DIR_LOCKER CXX )
 
 find_package( PkgConfig REQUIRED )
-find_package( OPENSSL REQUIRED )
 
-message( "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}" )
+
+
+if(APPLE)
+  find_package( OPENSSL REQUIRED )
+elseif(UNIX)
+  find_package( OpenSSL REQUIRED )
+else()
+  # winは未定義
+endif()
+
 
 if( OPENSSL_FOUND )
-  include_directories( ${OPENSSL_INCLUDE_DIR} )
   message( STATUS "Using OpenSSL ${OPENSSL_VERSION}" )
   message( STATUS "Openssl IncludeDir :: ${OPENSSL_INCLUDE_DIR}" )
+  message( STATUS "Openssl LibDir :: ${OPENSSL_LIBRARIES}")
+  include_directories( ${OPENSSL_INCLUDE_DIR} )
 else()
   message("(Failure) Found OPENSSL")
 endif()
-
 
 
 add_library( CRYPTO_MANAGER SHARED

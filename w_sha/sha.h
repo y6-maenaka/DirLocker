@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
-#include "openssl/evp.h"
 
 
 namespace openssl_wrapper

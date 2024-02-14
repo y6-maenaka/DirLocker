@@ -1,5 +1,7 @@
 #include "sha.h"
 
+#include "openssl/evp.h"
+
 
 namespace openssl_wrapper
 {
